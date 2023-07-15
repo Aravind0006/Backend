@@ -1,0 +1,70 @@
+
+USE [SunFreight_Live_Data_3]
+GO
+/////   /** Object:  StoredProcedure [dbo].[AirportSP]    Script Date: 07-07-2023 14:27:13 **/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+ALTER PROCEDURE [dbo].[employee]	
+		(
+		@Action varchar(75)=null,
+		@empId int=0,
+		@username varchar(20)=null,
+		@email varchar(200)=null,
+		@number int=0
+	
+		)
+		AS
+BEGIN 
+TRY
+BEGIN TRANSACTION
+IF @Action='InsertemployeeDetails'
+BEGIN
+      IF EXISTS (SELECT TOP 1 id FROM employee WHERE empId=@empId)
+	  BEGIN
+	       UPDATE employee SET IsActive=0 Where IsActive=1 AND empId=@empId 
+	  END
+	  ELSE
+	  BEGIN
+	       SET @empId=ISNULL((SELECT  TOP 1 empId+1 FROM employee ORDER BY empId DESC),1)
+	  END
+	       INSERT INTO employee 
+		(
+		empId,
+		username,
+		email,
+		number
+		
+		)
+		VALUES
+		(
+		@empId,
+		@username,
+		@email,
+		@number
+	
+		)
+SELECT '1'
+
+				
+END
+ELSE IF @Action='GetemployeeDetails'
+BEGIN
+    SELECT * FROM employee WHERE IsActive=1 order by empId desc;
+END
+COMMIT  TRANSACTION
+END TRY
+BEGIN CATCH
+   ROLLBACK TRANSACTION
+EXEC dbo.spGetErrorInfo  
+END CATCH
+
+
+Id,empid,username,email,number,Isactive bit
+
+
+
+
+
+
